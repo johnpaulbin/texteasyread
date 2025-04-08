@@ -1,224 +1,384 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Advanced Readability Enhancer</title>
     <meta charset="UTF-8">
-    <script src="https://unpkg.com/compromise@12.3.0/builds/compromise.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Text Readability</title>
     <style>
+        /* --- Basic Setup & Theme --- */
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
-        :root {
-            --noun: #FFD700;
-            --propn: #7FFF00;
-            --verb: #00FFFF;
-            --adj: #FF69B4;
-            --adv: #FF8C00;
-            --pron: #ADFF2F;
-            --aux: #B0E0E6;
-            --white: #FFFFFF;
-        }
 
         body {
             font-family: 'Open Sans', sans-serif;
-            background-color: #000;
-            color: #fff;
+            background-color: #1a1a1a; /* Slightly lighter black for less harshness */
+            color: #e0e0e0; /* Slightly off-white */
             margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .text-input {
+            max-width: 900px;
             width: 100%;
-            height: 200px;
-            margin: 20px 0;
-            padding: 15px;
-            background: #111;
-            color: #fff;
-            border: 1px solid #333;
-            border-radius: 4px;
-            font-size: 16px;
+            background-color: #000000;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px; /* Space below container */
         }
 
-        .output {
-            font-size: 20pt;
+        h1 {
+            color: #00FFFF; /* Aqua title */
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        /* --- Input Area --- */
+        #inputText {
+            width: 100%;
+            min-height: 150px;
+            background-color: #2b2b2b;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 16pt; /* Slightly smaller for input */
+            line-height: 1.5;
+            box-sizing: border-box; /* Include padding in width */
+            margin-bottom: 15px;
+            resize: vertical; /* Allow vertical resizing */
+        }
+
+        #processButton {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #00FFFF; /* Aqua button */
+            color: #000000;
+            border: none;
+            border-radius: 4px;
+            font-size: 16pt;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 30px; /* Space below button */
+        }
+
+        #processButton:hover {
+            background-color: #00cccc; /* Darker aqua on hover */
+        }
+        
+        #processButton:active {
+            background-color: #00aaaa; 
+        }
+
+        /* --- Output Area --- */
+        #outputContainer {
+            width: 100%;
+            background-color: #000000;
+            padding: 20px;
+            border: 1px solid #333; /* Subtle border */
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 20pt; /* Keep output larger */
             line-height: 1.6;
+            min-height: 100px; /* Minimum height */
+            white-space: pre-wrap; /* Preserve line breaks from input */
+            word-wrap: break-word; /* Break long words */
+        }
+
+        .reading-info {
+            font-size: 14pt;
+            color: #888888;
+            margin-bottom: 1.5em;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333333;
         }
 
         .paragraph {
             margin-bottom: 1.8em;
             padding-left: 15px;
-            border-left: 3px solid #333;
+            border-left: 3px solid #333333;
         }
 
         .sentence {
             margin-bottom: 0.25em;
             padding: 3px 0;
+            display: block; /* Ensure sentences are block elements */
         }
 
         .sentence-number {
-            color: #888;
+            color: #888888;
             font-size: 12pt;
             margin-right: 0.3em;
             vertical-align: super;
+            user-select: none; /* Don't allow selection of numbers */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .transitional {
             font-weight: bold;
             text-decoration: underline;
+            text-decoration-color: #FFD700; /* Gold underline */
+            text-underline-offset: 3px; /* Space out underline */
         }
 
         .complex {
-            background-color: rgba(255, 0, 0, 0.1);
+            background-color: rgba(255, 0, 0, 0.1); /* Subtle red background */
             border-radius: 3px;
+            padding: 2px 4px; /* Add slight padding */
+            margin: -2px -4px; /* Counteract padding for layout */
+            box-decoration-break: clone; /* Apply background across line breaks */
+            -webkit-box-decoration-break: clone;
         }
 
-        .reading-info {
-            font-size: 14pt;
-            color: #888;
-            margin-bottom: 1.5em;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #333;
+        .readability-score {
+           font-size: 12pt;
+           color: #666;
+           margin-top: 8px;
+           text-align: right;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Readability Enhancer</h1>
-        <textarea class="text-input" placeholder="Enter text to enhance..." id="inputText"></textarea>
-        <div class="reading-info" id="stats"></div>
-        <div class="output" id="output"></div>
+        <h1>Enhanced Text Readability Tool</h1>
+
+        <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+        <button id="processButton">Enhance Text</button>
+
+        <div id="outputContainer">
+            <!-- Enhanced text will appear here -->
+            <p style="color: #666; font-size: 16pt;">Processed text will be displayed here after you enter text above and click the button.</p>
+        </div>
     </div>
 
-    <script>
-        const transitionalPhrases = [
-            'however', 'therefore', 'for example', 'furthermore', 'in addition',
-            'moreover', 'nevertheless', 'in conclusion', 'additionally', 'thus',
-            'as a result', 'consequently', 'in summary'
-        ];
+    <!-- Load JavaScript Libraries -->
+    <!-- compromise.js for NLP -->
+    <script src="https://unpkg.com/compromise"></script>
+    <!-- textstat.js for Readability -->
+    <script src="https://cdn.jsdelivr.net/npm/textstat@0.1.3/textstat.min.js"></script>
 
+    <script>
+        // --- Configuration ---
+
+        // PART-OF-SPEECH → TEXT COLOR (on black background)
         const posColors = {
-            'Noun': 'var(--noun)',
-            'ProperNoun': 'var(--propn)',
-            'Verb': 'var(--verb)',
-            'Adjective': 'var(--adj)',
-            'Adverb': 'var(--adv)',
-            'Pronoun': 'var(--pron)',
-            'Auxiliary': 'var(--aux)',
-            'Determiner': 'var(--white)',
-            'Preposition': 'var(--white)',
-            'Conjunction': 'var(--white)',
-            'Number': 'var(--white)',
-            'Punctuation': 'var(--white)'
+            // Map compromise tags (simplified) to colors
+            "Noun":      "#FFD700",  // gold (Includes ProperNoun)
+            "ProperNoun":"#7FFF00",  // chartreuse
+            "Verb":      "#00FFFF",  // aqua (Includes Aux)
+            "Adjective": "#FF69B4",  // hotpink
+            "Adverb":    "#FF8C00",  // darkorange
+            "Pronoun":   "#ADFF2F",  // greenyellow
+            "Auxiliary": "#B0E0E6",  // powderblue
+            "Determiner":"#FFFFFF",  // white
+            "Preposition":"#FFFFFF", // white
+            "Conjunction":"#FFFFFF", // white (Includes Coordinating/Subordinating)
+            "Value":     "#FFFFFF",  // white (Numbers)
+            "Particle":  "#FFFFFF",  // white
+            "Expression":"#FFFFFF",  // white (Interjections)
+            "Symbol":    "#FFFFFF",  // white
+            "Punctuation":"#FFFFFF", // white (handled slightly differently)
+            "Space":     "#FFFFFF",  // white (handled via whitespace property)
+            "default":   "#FFFFFF"   // Fallback
         };
 
+        // Transitional phrases to highlight (using a Set for efficient lookup)
+        const transitionalPhrases = new Set([
+            "however", "therefore", "for example", "furthermore", "in addition",
+            "moreover", "nevertheless", "in conclusion", "additionally", "thus",
+            "as a result", "consequently", "in summary"
+            // Add more if needed, ensure lowercase for case-insensitive check
+        ]);
+
+        // --- Helper Functions ---
+
         function detectParagraphs(text) {
-            return text.split(/\n\s*\n/).filter(p => p.trim());
+            // Split text into paragraphs based on double line breaks, trimming whitespace
+            return text.split(/\n\s*\n/)
+                       .map(p => p.trim())
+                       .filter(p => p.length > 0); // Filter out empty paragraphs
         }
 
-        function isComplex(nlpDoc) {
-            const words = nlpDoc.terms().out('array').length;
-            const hasConjunction = nlpDoc.match('#Conjunction').found;
-            return words > 15 || hasConjunction;
+        function isComplexSentence(sent) {
+            // Basic check for complex sentences based on length and conjunctions
+            // 'sent' is a compromise sentence object
+            const wordCount = sent.terms().filter(term => term.is('Term')).length; // Count word-like terms
+            const hasConjunction = sent.has('#Conjunction'); // Check for any conjunction type
+
+            return wordCount > 15 || hasConjunction;
         }
 
-        function highlightText(text) {
-            const paragraphs = detectParagraphs(text);
-            let output = '';
-            let totalWords = 0;
-            let totalSentences = 0;
+         // Basic HTML escaping
+         function escapeHtml(unsafe) {
+            if (!unsafe) return "";
+            return unsafe
+                 .replace(/&/g, "&")
+                 .replace(/</g, "<")
+                 .replace(/>/g, ">")
+                 .replace(/"/g, """)
+                 .replace(/'/g, "'");
+         }
 
-            paragraphs.forEach(para => {
-                if (!para.trim()) return;
-                
-                const paraDoc = window.nlp(para);
-                const sentences = paraDoc.sentences().out('array');
-                totalSentences += sentences.length;
-                
-                let paraHTML = '<div class="paragraph">';
+        // Mapping compromise tags to our simplified categories for coloring
+        function getPosCategory(term) {
+            // Prioritize specific tags if available
+            if (term.has('#ProperNoun')) return "ProperNoun";
+            if (term.has('#Pronoun')) return "Pronoun";
+            if (term.has('#Auxiliary')) return "Auxiliary"; // Check Aux before Verb
+            if (term.has('#Verb')) return "Verb";
+            if (term.has('#Adjective')) return "Adjective";
+            if (term.has('#Adverb')) return "Adverb";
+            if (term.has('#Noun')) return "Noun"; // Noun after ProperNoun
+            if (term.has('#Determiner')) return "Determiner";
+            if (term.has('#Preposition')) return "Preposition";
+            if (term.has('#Conjunction')) return "Conjunction";
+            if (term.has('#Value')) return "Value"; // For numbers
+            if (term.has('#Particle')) return "Particle"; // e.g., 'to' in infinitive, 'not'
+            if (term.has('#Expression') || term.has('#Interjection')) return "Expression";
+            if (term.has('#Symbol') || term.has('#Currency')) return "Symbol";
+            if (term.has('#Punctuation')) return "Punctuation"; // Usually just whitespace after
+            if (term.has('#Space')) return "Space"; // Explicit space term
+
+            // Fallback based on broader categories if specific tags missed
+            const tags = term.tags;
+            if (tags.has('Noun')) return "Noun"; // Broader fallback
+            if (tags.has('Verb')) return "Verb";
+            // ... add more fallbacks if needed
+
+            return "default"; // Default color
+        }
+
+
+        // --- Main Processing Function ---
+
+        function highlightTextForFluency(text) {
+            if (!text || text.trim().length === 0) {
+                return '<p style="color: #666; font-size: 16pt;">Please enter some text to process.</p>';
+            }
+
+            const doc = compromise(text); // Process the entire text with compromise
+            const paragraphs = detectParagraphs(text); // Split manually for better paragraph control
+
+            // Calculate overall stats
+            const wordCount = doc.wordCount();
+            const sentenceCount = doc.sentences().length;
+            const readingTime = Math.max(1, Math.round(wordCount / 200)); // Assuming 200 WPM
+
+            let htmlOut = `
+                <div class="reading-info">
+                  Reading time: ~${readingTime} minute(s) | ${wordCount} words | ${sentenceCount} sentences
+                </div>`;
+
+            // Process each paragraph
+            paragraphs.forEach((paraText, paraIndex) => {
+                if (!paraText.trim()) return; // Skip empty paragraphs
+
+                const paraDoc = compromise(paraText); // Process paragraph text
+                const fleschScore = textstat.flesch_reading_ease(paraText); // Calculate readability
+
+                htmlOut += `<div class="paragraph">\n`;
                 let sentenceNumber = 1;
 
-                sentences.forEach(sentenceText => {
-                    const sentenceDoc = window.nlp(sentenceText);
-                    const words = sentenceDoc.terms().out('array');
-                    totalWords += words.length;
+                paraDoc.sentences().forEach(sent => {
+                    const isComplex = isComplexSentence(sent);
+                    let sentClass = "sentence";
+                    if (isComplex) {
+                        sentClass += " complex";
+                    }
 
-                    const isComplexClass = isComplex(sentenceDoc) ? 'complex' : '';
-                    paraHTML += `
-                        <div class="sentence ${isComplexClass}">
-                            <span class="sentence-number">${sentenceNumber++}</span>
-                            ${highlightSentence(sentenceDoc)}
-                        </div>`;
+                    htmlOut += `<div class="${sentClass}">`;
+                    htmlOut += `<span class="sentence-number">${sentenceNumber}</span>`;
+                    sentenceNumber++;
+
+                    sent.terms().forEach(term => {
+                        const tokenText = term.text; // The actual word/punctuation
+                        const safeText = escapeHtml(tokenText);
+                        const whitespace = escapeHtml(term.whitespaceAfter || ''); // Whitespace after the token
+                        const posCategory = getPosCategory(term);
+                        const color = posColors[posCategory] || posColors.default;
+
+                        let tokenHtml;
+                        const lowerCaseText = tokenText.toLowerCase();
+
+                        // Check for transitional phrases (case-insensitive)
+                        // Also check if it's the start of the phrase (e.g., "For example")
+                        let isTransitional = false;
+                        if (transitionalPhrases.has(lowerCaseText)) {
+                            // Simple check: is it one word?
+                            isTransitional = true;
+                        } else {
+                           // Check multi-word phrases (basic approach)
+                            const phraseMatch = Array.from(transitionalPhrases).find(phrase =>
+                                phrase.includes(' ') && lowerCaseText === phrase.split(' ')[0] && sent.text('normal').toLowerCase().startsWith(phrase)
+                            );
+                             if (phraseMatch) {
+                                // This logic needs refinement to correctly span multiple terms
+                                // For now, we only highlight the first word reliably
+                                isTransitional = true; // Mark the first word
+                                // Future improvement: mark subsequent words of the phrase too
+                             }
+                        }
+
+
+                        if (isTransitional) {
+                            tokenHtml = `<span class="transitional" style="color:${color};">${safeText}</span>`;
+                        } else {
+                            tokenHtml = `<span style="color:${color};">${safeText}</span>`;
+                        }
+
+                        htmlOut += tokenHtml + whitespace; // Add token and its trailing whitespace
+                    });
+
+                    htmlOut += `</div>\n`; // Close sentence div
                 });
 
-                const fleschScore = calculateFlesch(para);
-                paraHTML += `<div style="font-size:12pt;color:#666;margin-top:8px;">
-                            Readability: ${fleschScore}/100</div></div>`;
-                output += paraHTML;
+                // Add readability score if paragraph is reasonably long
+                if (paraText.split(/\s+/).length > 10) { // Count words roughly
+                     htmlOut += `<div class="readability-score">Readability: ${fleschScore.toFixed(0)}/100</div>`;
+                }
+
+                htmlOut += `</div>\n`; // Close paragraph div
             });
 
-            const readingTime = Math.max(1, Math.round(totalWords / 200));
-            document.getElementById('stats').innerHTML = `
-                Reading time: ~${readingTime} minute(s) | ${totalWords} words | ${totalSentences} sentences
-            `;
-
-            return output;
+            return htmlOut;
         }
 
-        function highlightSentence(doc) {
-            let highlighted = '';
-            const terms = doc.json()[0].terms;
-            
-            terms.forEach(term => {
-                const text = term.text;
-                const pos = term.tags[0];
-                const isTransitional = checkTransitional(text, terms);
-                
-                let color = posColors[pos] || 'var(--white)';
-                let spanClass = isTransitional ? 'transitional' : '';
+        // --- Event Listener ---
 
-                highlighted += `<span class="${spanClass}" style="color:${color}">${text}</span>`;
-                highlighted += term.post || '';
-            });
+        const inputText = document.getElementById('inputText');
+        const processButton = document.getElementById('processButton');
+        const outputContainer = document.getElementById('outputContainer');
 
-            return highlighted;
-        }
-
-        function checkTransitional(word, terms) {
-            const index = terms.findIndex(t => t.text === word);
-            const phrase = terms.slice(index, index + 2)
-                               .map(t => t.text.toLowerCase())
-                               .join(' ');
-            
-            return transitionalPhrases.some(tp => tp === word.toLowerCase() || tp === phrase);
-        }
-
-        function calculateFlesch(text) {
-            const doc = window.nlp(text);
-            const sentences = doc.sentences().length || 1;
-            const words = doc.terms().length || 1;
-            const syllables = doc.terms().out('array').reduce((acc, word) => 
-                acc + countSyllables(word), 0);
-
-            return Math.round(206.835 - 
-                1.015 * (words / sentences) - 
-                84.6 * (syllables / words));
-        }
-
-        function countSyllables(word) {
-            word = word.toLowerCase().replace(/'/g, '');
-            if(word.length <= 3) return 1;
-            word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
-            const matches = word.match(/[aeiouy]{1,2}/g);
-            return matches ? matches.length : 0;
-        }
-
-        document.getElementById('inputText').addEventListener('input', (e) => {
-            const text = e.target.value;
-            document.getElementById('output').innerHTML = highlightText(text);
+        processButton.addEventListener('click', () => {
+            const textToProcess = inputText.value;
+            try {
+                const enhancedHtml = highlightTextForFluency(textToProcess);
+                outputContainer.innerHTML = enhancedHtml;
+            } catch (error) {
+                console.error("Error processing text:", error);
+                outputContainer.innerHTML = `<p style="color: #FF69B4;">An error occurred during processing. Check the browser console for details.</p>`;
+            }
         });
+
+        // Optional: Process initial example text on load
+        const initialText = `You are an outer-space alien that has come to Earth. You support advanced alien research by recording sound samples. However, these samples are of top-secret human Earth things. Therefore, you must be very careful.
+
+Furthermore, you need to analyze the complexity of human language patterns. For example, some sentences are long and contain subordinate clauses, making them complex. Additionally, transitional phrases guide the reader. In conclusion, this mission requires linguistic skill.`;
+        inputText.value = initialText;
+        // Uncomment below to auto-process on load
+        // processButton.click();
+
+
     </script>
+
 </body>
 </html>
